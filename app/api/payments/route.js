@@ -55,12 +55,13 @@ export async function POST(request) {
       .from('payments')
       .insert({
         learner_id: user.id,
+        course_id: courseId,
         amount: course.price,
         currency: course.currency,
         provider,
         status: 'pending',
       })
-      .select('id, amount, currency, provider, status, created_at')
+      .select('id, amount, currency, provider, status, course_id, created_at')
       .single();
 
     if (error) throw error;
