@@ -1,4 +1,4 @@
-import { getSupabaseClient } from "../../lib/supabase";
+import { supabase } from "../../lib/supabaseClient";
 import { VerificationForm } from "../../components/VerificationForm";
 import { CertificateFound, CertificateNotFound } from "../../components/CertificateResult";
 import styles from "./page.module.css";
@@ -14,7 +14,6 @@ export const metadata = {
 };
 
 async function getCertificate(id) {
-  const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from("certificates")
     .select("*")
