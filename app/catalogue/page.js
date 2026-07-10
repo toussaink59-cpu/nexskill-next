@@ -149,12 +149,13 @@ function handleCardAction(c) {
                     )}
                     <button
                       type="button"
-                      onClick={() => handleEnroll(c.id)}
+                      onClick={() => handleCardAction(c)}
                       disabled={isEnrolling || isEnrolled}
                       className="btn gold"
                       style={{ textAlign: 'center', justifyContent: 'center', opacity: isEnrolled ? 0.7 : 1, cursor: isEnrolled ? 'default' : 'pointer' }}
                     >
-                      {isEnrolled ? 'Déjà inscrit ✓' : isEnrolling ? 'Inscription…' : "S'inscrire"}
+                      {isEnrolled ? 'Déjà inscrit ✓' : isEnrolling ? 'Inscription…' : Number(c.price) > 0 ? `Payer ${Number(c.price).toLocaleString('fr-FR')} FCFA` : "S'inscrire (gratuit)"}
+                    </button>
                     </button>
                   </div>
                 );
