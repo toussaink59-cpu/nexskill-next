@@ -156,7 +156,6 @@ function handleCardAction(c) {
                     >
                       {isEnrolled ? 'Déjà inscrit ✓' : isEnrolling ? 'Inscription…' : Number(c.price) > 0 ? `Payer ${Number(c.price).toLocaleString('fr-FR')} FCFA` : "S'inscrire (gratuit)"}
                     </button>
-                    </button>
                   </div>
                 );
               })}
