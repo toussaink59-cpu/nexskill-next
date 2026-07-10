@@ -13,6 +13,7 @@ const FILIERE_LABELS = {
   marketing: "Marketing digital", entrepreneuriat: "Entrepreneuriat", finance: "Finance & comptabilité",
   design: "Design graphique", video: "Montage vidéo", bureautique: "Bureautique", langues: "Langues"
 };
+const STATUS_LABELS = { active: 'En cours', completed: 'Terminée', cancelled: 'Annulée' };
 
 export default function ComptePage() {
   const [mode, setMode] = useState('login'); // login | signup | forgot
@@ -29,6 +30,8 @@ export default function ComptePage() {
   const [courseForm, setCourseForm] = useState({ title: '', filiere: FILIERES[0], duration: 10 });
   const [offerForm, setOfferForm] = useState({ title: '', filiere: FILIERES[0], description: '' });
   const [actionResult, setActionResult] = useState(null);
+  const [enrollments, setEnrollments] = useState([]);
+  const [enrollmentsState, setEnrollmentsState] = useState('idle'); // idle | loading | ready | error
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -45,7 +48,21 @@ export default function ComptePage() {
   async function loadProfile(sess) {
     setSession(sess);
     const { data, error } = await supabase.from('profiles').select('name, role, extra').eq('id', sess.user.id).single();
-    if (!error && data) setProfile(data);
+    if (!error && data) {
+      setProfile(data);
+      if (data.role === 'apprenant') loadEnrollments(sess);
+    }
+  }
+
+  async function loadEnrollments(sess) {
+    setEnrollmentsState('loading');
+    const res = await fetch('/api/enrollments', {
+      headers: { Authorization: 'Bearer ' + sess.access_token },
+    });
+    if (!res.ok) { setEnrollmentsState('error'); return; }
+    const data = await res.json();
+    setEnrollments(data.enrollments || []);
+    setEnrollmentsState('ready');
   }
 
   async function handleSubmit(e) {
@@ -99,6 +116,7 @@ export default function ComptePage() {
     setProfile(null);
     setCertResult(null);
     setActionResult(null);
+    setEnrollments([]);
     setMode('login');
   }
 
@@ -246,6 +264,40 @@ export default function ComptePage() {
                 </div>
 
                 {actionResult?.text && <div className={'msg-banner ' + actionResult.type}>{actionResult.text}</div>}
+
+                {profile.role === 'apprenant' && (
+                  <div style={{ background: 'var(--bg)', borderRadius: 12, padding: 22, marginBottom: 16 }}>
+                    <b style={{ display: 'block', fontSize: 14, marginBottom: 12 }}>Mes formations</b>
+
+                    {enrollmentsState === 'loading' && (
+                      <p style={{ fontSize: 13, color: 'var(--muted)' }}>Chargement…</p>
+                    )}
+                    {enrollmentsState === 'error' && (
+                      <p style={{ fontSize: 13, color: 'var(--muted)' }}>Impossible de charger vos formations pour le moment.</p>
+                    )}
+                    {enrollmentsState === 'ready' && enrollments.length === 0 && (
+                      <p style={{ fontSize: 13, color: 'var(--muted)' }}>
+                        Vous n&apos;êtes inscrit à aucune formation pour l&apos;instant.{' '}
+                        <a href="/catalogue" style={{ color: 'var(--teal)', fontWeight: 600 }}>Parcourir le catalogue →</a>
+                      </p>
+                    )}
+                    {enrollmentsState === 'ready' && enrollments.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {enrollments.map((en) => (
+                          <div key={en.id} style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 10, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                            <div>
+                              <div style={{ fontSize: 13.5, fontWeight: 600 }}>{en.course?.title || 'Formation'}</div>
+                              <div style={{ fontSize: 11.5, color: 'var(--muted)' }}>{FILIERE_LABELS[en.course?.filiere] || en.course?.filiere}</div>
+                            </div>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--teal)', background: 'var(--teal-light)', padding: '4px 10px', borderRadius: 999, whiteSpace: 'nowrap' }}>
+                              {STATUS_LABELS[en.status] || en.status}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {profile.role === 'apprenant' && (
                   <div style={{ background: 'var(--bg)', borderRadius: 12, padding: 22, marginBottom: 16 }}>
