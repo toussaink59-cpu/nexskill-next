@@ -13,7 +13,7 @@ export async function GET() {
     const admin = getSupabaseAdmin();
     const { data, error } = await admin
       .from('courses')
-      .select('id, title, filiere, duration, trainer_name, source, created_at')
+      .select('id, title, filiere, duration, trainer_name, source, price, currency, level, created_at')
       .order('created_at', { ascending: false })
       .limit(200);
     if (error) throw error;
