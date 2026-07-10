@@ -37,7 +37,11 @@ export default function CataloguePage() {
       return matchFiliere && matchSearch;
     });
   }, [courses, activeFiliere, search]);
-
+function handleCardAction(c) {
+    if (!session) { window.location.href = '/compte'; return; }
+    if (Number(c.price) > 0) { window.location.href = '/paiement?course=' + c.id; return; }
+    handleEnroll(c.id);
+  }
   async function handleEnroll(courseId) {
     setFeedback(null);
 
