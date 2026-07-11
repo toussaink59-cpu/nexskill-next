@@ -7,7 +7,8 @@ export async function POST(request, { params }) {
     const user = await getUserFromRequest(request);
     if (!user) return NextResponse.json({ error: 'Connexion requise.' }, { status: 401 });
 
-    const paymentId = params.id;
+    const resolvedParams = await params;
+    const paymentId = resolvedParams.id;
     const admin = getSupabaseAdmin();
 
     const { data: payment, error: paymentError } = await admin
