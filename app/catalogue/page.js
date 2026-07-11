@@ -142,7 +142,9 @@ function handleCardAction(c) {
                         <span style={{ fontSize: 10.5, fontWeight: 600, color: 'var(--gold)', background: 'var(--gold-light)', padding: '4px 9px', borderRadius: 999 }}>Communauté</span>
                       )}
                     </div>
-                    <h4 style={{ fontSize: 15.5, fontWeight: 600, marginBottom: 8 }}>{c.title}</h4>
+                    <a href={`/formation/${c.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      <h4 style={{ fontSize: 15.5, fontWeight: 600, marginBottom: 8 }}>{c.title}</h4>
+                    </a>
                     <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 18, flex: 1 }}>{c.duration || '—'} heures · Niveau intermédiaire</div>
                     {c.source === 'community' && c.trainer_name && (
                       <div style={{ fontSize: 11.5, color: 'var(--muted)', marginBottom: 14 }}>Par {c.trainer_name}</div>
